@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">DramaPop</string>
+    <string name="facebook_app_id">1090576830489562</string>
+    <string name="facebook_client_token">82fb354e388eebf70c71a49b6950613c</string>
+    <string name="fb_login_protocol_scheme">fb1090576830489562</string>
+</resources>

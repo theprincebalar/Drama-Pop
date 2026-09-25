@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "324442220312",
+    "project_id": "fir-28d8f",
+    "storage_bucket": "fir-28d8f.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:324442220312:android:2f59b90c6da2d6259fe06d",
+        "android_client_info": {
+          "package_name": "com.dramapop.app.series.shorts.dramas"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCwlIpx2xh3nP55y69SBwe6OAkxyJZ4vws"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
