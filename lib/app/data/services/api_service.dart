@@ -123,7 +123,7 @@ class ApiService {
       final list = json.decode(jsonStr) as List? ?? [];
       _catalogCache = list
           .map((item) => SeriesModel.fromJson(Map<String, dynamic>.from(item)))
-          .where((s) => !_excludedBrokenSeriesIds.contains(s.id) && s.episodesCount > 0)
+          .where((s) => !_excludedBrokenSeriesIds.contains(s.id) && s.episodesCount > 0 && s.status != 'Hidden' && s.status != 'hidden')
           .toList();
       debugPrint(' Loaded ${_catalogCache.length} verified series from catalog asset.');
     } catch (e) {
