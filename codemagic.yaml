@@ -12,14 +12,13 @@ workflows:
       vars:
         APP_ID: "com.dramapop.app.series.shorts.dramas"
     scripts:
-      - name: Set up code signing settings on Xcode project
+      - name: Set up keychain and fetch signing certificates
         script: |
           keychain initialize
           app-store-connect fetch-signing-files "$APP_ID" \
             --type IOS_APP_STORE \
             --create
           keychain add-certificates
-          xcode-project use-profiles
       - name: Get Flutter packages
         script: |
           flutter packages pub get
@@ -29,6 +28,9 @@ workflows:
       - name: Flutter build iOS
         script: |
           flutter build ios --release --no-codesign
+      - name: Apply Provisioning Profiles to Xcode project
+        script: |
+          xcode-project use-profiles --project ios/Runner.xcodeproj
       - name: Build and Sign IPA
         script: |
           xcode-project build-ipa \
