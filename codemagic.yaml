@@ -6,19 +6,13 @@ workflows:
     integrations:
       app_store_connect: Drama API Key
     environment:
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: com.dramapop.app.series.shorts.dramas
       flutter: stable
       xcode: latest
       cocoapods: default
-      vars:
-        APP_ID: "com.dramapop.app.series.shorts.dramas"
     scripts:
-      - name: Set up keychain and fetch signing certificates
-        script: |
-          keychain initialize
-          app-store-connect fetch-signing-files "$APP_ID" \
-            --type IOS_APP_STORE \
-            --create
-          keychain add-certificates
       - name: Get Flutter packages
         script: |
           flutter packages pub get
@@ -28,9 +22,6 @@ workflows:
       - name: Flutter build iOS
         script: |
           flutter build ios --release --no-codesign
-      - name: Apply Provisioning Profiles to Xcode project
-        script: |
-          xcode-project use-profiles --project ios/Runner.xcodeproj
       - name: Build and Sign IPA
         script: |
           xcode-project build-ipa \
