@@ -26,13 +26,15 @@ class ApiService {
     final hmacSha256 = Hmac(sha256, utf8.encode(clientHmacSecret));
     final signature = hmacSha256.convert(utf8.encode(payloadToSign)).toString();
 
+    final isIos = defaultTargetPlatform == TargetPlatform.iOS;
     return {
       'Accept': 'application/json',
       'Accept-Encoding': 'gzip',
-      'User-Agent': 'DramaPop-App/1.0',
+      'User-Agent': isIos ? 'DramaPop-App/1.0 (iOS)' : 'DramaPop-App/1.0 (Android)',
       'X-DramaPop-Key': clientApiKey,
       'X-DramaPop-Timestamp': timestamp.toString(),
       'X-DramaPop-Signature': signature,
+      'X-DramaPop-Platform': isIos ? 'ios' : 'android',
     };
   }
 
@@ -44,7 +46,7 @@ class ApiService {
   static final List<SeriesModel> defaultRotatingPool = [
     SeriesModel(
       id: '6',
-      title: 'Sold My Special Service',
+      title: 'Bound to the Billionaire',
       description: 'Billionaire romance story',
       coverUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=600&auto=format&fit=crop&q=80',
       genres: ['Billionaire', 'Romance'],
@@ -121,9 +123,16 @@ class ApiService {
     try {
       final jsonStr = await rootBundle.loadString('assets/data/catalog.json');
       final list = json.decode(jsonStr) as List? ?? [];
+      final isIos = defaultTargetPlatform == TargetPlatform.iOS;
       _catalogCache = list
           .map((item) => SeriesModel.fromJson(Map<String, dynamic>.from(item)))
-          .where((s) => !_excludedBrokenSeriesIds.contains(s.id) && s.episodesCount > 0 && s.status != 'Hidden' && s.status != 'hidden')
+          .where((s) {
+            if (_excludedBrokenSeriesIds.contains(s.id)) return false;
+            if (s.episodesCount <= 0) return false;
+            if (s.isHidden || s.status == 'Hidden' || s.status == 'hidden') return false;
+            if (isIos && s.hideOnIos) return false;
+            return true;
+          })
           .toList();
       debugPrint(' Loaded ${_catalogCache.length} verified series from catalog asset.');
     } catch (e) {
@@ -134,6 +143,7 @@ class ApiService {
 
   // Fast Progressive Paginated Fetch with instant offline fallback
   static Future<List<SeriesModel>> getSeries({String? genre, String? search, int page = 1, int limit = 24}) async {
+    final isIos = defaultTargetPlatform == TargetPlatform.iOS;
     // 1. Try Live Network API with Cryptographic Signing
     try {
       var url = '$baseUrl/series?page=$page&limit=$limit';
@@ -155,7 +165,13 @@ class ApiService {
         if (list.isNotEmpty) {
           final result = list
               .map((item) => SeriesModel.fromJson(Map<String, dynamic>.from(item)))
-              .where((s) => !_excludedBrokenSeriesIds.contains(s.id) && s.episodesCount > 0)
+              .where((s) {
+                if (_excludedBrokenSeriesIds.contains(s.id)) return false;
+                if (s.episodesCount <= 0) return false;
+                if (s.isHidden || s.status == 'Hidden' || s.status == 'hidden') return false;
+                if (isIos && s.hideOnIos) return false;
+                return true;
+              })
               .toList();
           return result;
         }
@@ -338,8 +354,8 @@ class ApiService {
   static SeriesModel _getFallbackDrama() {
     return SeriesModel(
       id: '6',
-      title: 'After I Sold My Special Service to a Billionaire',
-      description: 'Elizabeth disguises herself to deal with a date, leading to an accidental meeting with the richest billionaire.',
+      title: 'Accidentally Bound to the Billionaire',
+      description: 'Elizabeth disguises herself to deal with an arranged date, leading to an accidental meeting with the city\'s richest billionaire.',
       coverUrl: 'https://dramapop-admin.genxappstudio.cloud/covers/6.webp',
       genres: ['Billionaire', 'Romance', 'CEO'],
       episodesCount: 82,

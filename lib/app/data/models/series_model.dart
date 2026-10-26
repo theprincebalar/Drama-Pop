@@ -14,6 +14,8 @@ class SeriesModel {
   final List<EpisodeModel> episodes;
   final String? year;
   final String? status;
+  final bool isHidden;
+  final bool hideOnIos;
 
   SeriesModel({
     required this.id,
@@ -27,6 +29,8 @@ class SeriesModel {
     this.episodes = const [],
     this.year = '2026',
     this.status = 'Completed',
+    this.isHidden = false,
+    this.hideOnIos = false,
   });
 
   static int calculateFreeEpisodesCount(int totalEpisodes) {
@@ -106,6 +110,8 @@ class SeriesModel {
     }
 
     final cover = json['coverUrl'] ?? json['coverImage'] ?? json['cover_url'] ?? (sid.isNotEmpty ? 'https://dramapop-admin.genxappstudio.cloud/covers/$sid.webp?v=2' : 'https://placehold.co/400x600/1e293b/cbd5e1?text=DramaPop');
+    final isHidden = json['isHidden'] == true || json['status'] == 'Hidden' || json['status'] == 'hidden';
+    final hideOnIos = json['hideOnIos'] == true || json['isHiddenOnIos'] == true || json['iosHidden'] == true;
 
     return SeriesModel(
       id: sid,
@@ -119,6 +125,8 @@ class SeriesModel {
       episodes: parsedEpisodes,
       year: json['year'] ?? '2026',
       status: json['status'] ?? 'Completed',
+      isHidden: isHidden,
+      hideOnIos: hideOnIos,
     );
   }
 
@@ -135,6 +143,8 @@ class SeriesModel {
       'episodes': episodes.map((e) => e.toJson()).toList(),
       'year': year,
       'status': status,
+      'isHidden': isHidden,
+      'hideOnIos': hideOnIos,
     };
   }
 }
